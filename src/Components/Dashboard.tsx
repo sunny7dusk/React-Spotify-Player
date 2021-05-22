@@ -51,32 +51,45 @@ export const Dashboard:React.FC<Props> = ({ code }:Props) => {
         setDebouncedVal(value);
         if (!search) { setSearchResults([]); return; }
         if (!accessToken) return;
-        if (!search.includes('playlist')) {
-          spotifyApi.searchTracks(search).then((res) => {
-            setSearchResults(res.body?.tracks?.items.map((track) => ({
-              artists: track.artists[0].name,
-              title: track.name,
-              uri: track.uri,
-              albumUrl: track.album.images[2].url,
-            })));
-          });
-        } else {
-          const formatted = search.replace(' playlist', '');
-          console.log(formatted);
-          spotifyApi.getPlaylist(formatted).then((res) => {
-            setQueue(res.body?.tracks?.items.map((track) => (track.track.uri)));
-            // console.log(queue);
-            setSearchResults(res.body?.tracks?.items.map((track) => ({
-              artists: track.track.artists[0].name,
-              title: track.track.name,
-              uri: track.track.uri,
-              albumUrl: track.track.album.images[2].url,
-            })));
-          }, (err) => {
-            console.log(err);
-          });
-          console.log(queue);
-        }
+        const formatted = search;
+        spotifyApi.getPlaylist(formatted).then((res) => {
+          setQueue(res.body?.tracks?.items.map((track) => (track.track.uri)));
+          // console.log(queue);
+          setSearchResults(res.body?.tracks?.items.map((track) => ({
+            artists: track.track.artists[0].name,
+            title: track.track.name,
+            uri: track.track.uri,
+            albumUrl: track.track.album.images[2].url,
+          })));
+        }, (err) => {
+          console.log(err);
+        });
+        // if (!search.includes('playlist')) {
+        //   spotifyApi.searchTracks(search).then((res) => {
+        //     setSearchResults(res.body?.tracks?.items.map((track) => ({
+        //       artists: track.artists[0].name,
+        //       title: track.name,
+        //       uri: track.uri,
+        //       albumUrl: track.album.images[2].url,
+        //     })));
+        //   });
+        // } else {
+        //   const formatted = search.replace(' playlist', '');
+        //   console.log(formatted);
+        //   spotifyApi.getPlaylist(formatted).then((res) => {
+        //     setQueue(res.body?.tracks?.items.map((track) => (track.track.uri)));
+        //     // console.log(queue);
+        //     setSearchResults(res.body?.tracks?.items.map((track) => ({
+        //       artists: track.track.artists[0].name,
+        //       title: track.track.name,
+        //       uri: track.track.uri,
+        //       albumUrl: track.track.album.images[2].url,
+        //     })));
+        //   }, (err) => {
+        //     console.log(err);
+        //   });
+        //   console.log(queue);
+        // }
       }, 500);
 
       return () => {
