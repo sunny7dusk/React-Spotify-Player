@@ -51,7 +51,12 @@ export const Dashboard:React.FC<Props> = ({ code }:Props) => {
         setDebouncedVal(value);
         if (!search) { setSearchResults([]); return; }
         if (!accessToken) return;
-        const formatted = search;
+        let formatted = '';
+        let i = 34;
+        while (value.substring(i, i + 1) !== '?') {
+          formatted += value.substring(i, i + 1);
+          i += 1;
+        }
         spotifyApi.getPlaylist(formatted).then((res) => {
           setQueue(res.body?.tracks?.items.map((track) => (track.track.uri)));
           // console.log(queue);
