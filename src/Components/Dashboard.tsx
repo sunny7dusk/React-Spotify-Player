@@ -128,7 +128,7 @@ export const Dashboard:React.FC<Props> = ({ code }:Props) => {
   //   console.log(playing);
   // }, [playing]);
 
-  window.history.pushState({}, '', '/');
+  // window.history.pushState({}, '', '/');
   return (
     <ImageUploading value={images} onChange={onChange} maxNumber={1}>
       {({ imageList, onImageUpload, onImageUpdate }) => (
