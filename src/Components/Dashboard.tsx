@@ -112,6 +112,7 @@ export const Dashboard:React.FC<Props> = ({ code }:Props) => {
   // TODO
   useEffect(() => {
     setQueue(queue.sort(() => Math.random() - 0.5));
+    console.log(queue);
   }, [queue]);
 
   useEffect(() => {
@@ -143,7 +144,7 @@ export const Dashboard:React.FC<Props> = ({ code }:Props) => {
               <form noValidate autoComplete="off" style={{ width: '100vw' }}>
                 <TextField
                   id="filled-basic"
-                  label="Search using playlist code (1RE5EjfEDFgRSeYLuwoRv8 etc) "
+                  label="Paste spotify playlist code "
                   variant="filled"
                   value={search}
                   fullWidth
