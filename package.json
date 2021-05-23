@@ -1,7 +1,7 @@
 {
   "name": "react-spotify-player",
   "version": "0.1.0",
-  "homepage": "http://sunny7dusk.github.io/React-Spotify-Player",
+  "homepage": "http://sunny7dusk.github.io/React-Spotify-Player/",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.4",
