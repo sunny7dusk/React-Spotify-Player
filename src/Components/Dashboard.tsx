@@ -60,18 +60,18 @@ export const Dashboard:React.FC<Props> = ({ code }:Props) => {
         spotifyApi.getPlaylist(formatted).then((res) => {
           res.body?.tracks?.items.map((track) => (queue.push(track.track.uri)));
           // setQueue(res.body?.tracks?.items.map((track) => (track.track.uri)));
-          const newQueue = Array.from(queue);
+          // const newQueue = Array.from(queue);
           for (let i = queue.length - 1; i > 0; i -= 1) {
             const j = Math.floor(Math.random() * i);
             const temp = queue[i];
             queue[i] = queue[j];
             queue[j] = temp;
-            const temp2 = newQueue[i];
-            newQueue[i] = newQueue[j];
-            newQueue[j] = temp2;
+            // const temp2 = newQueue[i];
+            // newQueue[i] = newQueue[j];
+            // newQueue[j] = temp2;
           }
 
-          setQueue(newQueue);
+          setQueue(queue);
           // console.log(queue);
           setSearchResults(res.body?.tracks?.items.map((track) => ({
             artists: track.track.artists[0].name,
