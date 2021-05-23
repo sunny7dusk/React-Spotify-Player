@@ -111,7 +111,13 @@ export const Dashboard:React.FC<Props> = ({ code }:Props) => {
 
   // TODO
   useEffect(() => {
-    setQueue(queue.sort(() => Math.random() - 0.5));
+    // setQueue(queue.sort(() => Math.random() - 0.5));
+    for (let i = queue.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * i);
+      const temp = queue[i];
+      queue[i] = queue[j];
+      queue[j] = temp;
+    }
     console.log(queue);
   }, [queue]);
 
