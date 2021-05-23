@@ -52,13 +52,26 @@ export const Dashboard:React.FC<Props> = ({ code }:Props) => {
         if (!search) { setSearchResults([]); return; }
         if (!accessToken) return;
         let formatted = '';
-        let i = 34;
-        while (value.substring(i, i + 1) !== '?') {
-          formatted += value.substring(i, i + 1);
-          i += 1;
+        let z = 34;
+        while (value.substring(z, z + 1) !== '?') {
+          formatted += value.substring(z, z + 1);
+          z += 1;
         }
         spotifyApi.getPlaylist(formatted).then((res) => {
-          setQueue(res.body?.tracks?.items.map((track) => (track.track.uri)));
+          res.body?.tracks?.items.map((track) => (queue.push(track.track.uri)));
+          // setQueue(res.body?.tracks?.items.map((track) => (track.track.uri)));
+          const newQueue = Array.from(queue);
+          for (let i = queue.length - 1; i > 0; i -= 1) {
+            const j = Math.floor(Math.random() * i);
+            const temp = queue[i];
+            queue[i] = queue[j];
+            queue[j] = temp;
+            const temp2 = newQueue[i];
+            newQueue[i] = newQueue[j];
+            newQueue[j] = temp2;
+          }
+
+          setQueue(newQueue);
           // console.log(queue);
           setSearchResults(res.body?.tracks?.items.map((track) => ({
             artists: track.track.artists[0].name,
@@ -112,24 +125,18 @@ export const Dashboard:React.FC<Props> = ({ code }:Props) => {
   // TODO
   useEffect(() => {
     // setQueue(queue.sort(() => Math.random() - 0.5));
-    const newQueue = Array.from(queue);
-    // setQueue(queue.map((item, index) => {
-    //   const j = Math.floor(Math.random() * index);
-    //   const temp = queue[index];
-    //   queue[index] = queue[j];
+    // const newQueue = Array.from(queue);
+    // for (let i = queue.length - 1; i > 0; i -= 1) {
+    //   const j = Math.floor(Math.random() * i);
+    //   const temp = queue[i];
+    //   queue[i] = queue[j];
     //   queue[j] = temp;
-    // }));
-    for (let i = queue.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(Math.random() * i);
-      const temp = queue[i];
-      queue[i] = queue[j];
-      queue[j] = temp;
-      const temp2 = newQueue[i];
-      newQueue[i] = newQueue[j];
-      newQueue[j] = temp2;
-    }
+    //   const temp2 = newQueue[i];
+    //   newQueue[i] = newQueue[j];
+    //   newQueue[j] = temp2;
+    // }
 
-    setQueue(newQueue);
+    // setQueue(newQueue);
     console.log(queue);
   }, [queue]);
 
