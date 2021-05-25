@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 import React, { useState, useEffect } from 'react';
 import {
   Grid, Button,
@@ -43,6 +44,24 @@ export const Dashboard:React.FC<Props> = ({ code }:Props) => {
     setPlayingTrack(track);
     setSearch('');
   }
+  function playlist(formatted:string, off:number, listData:SpotifyData[], queueT:string[]) {
+    spotifyApi.getPlaylistTracks(formatted, { offset: off }).then((val) => {
+      // eslint-disable-next-line array-callback-return
+      val.body?.items.map((t) => {
+        queueT.push(t.track.uri);
+        // listData?.push({
+        //   artists: t.track.artists[0].name,
+        //   title: t.track.name,
+        //   uri: t.track.uri,
+        //   albumUrl: t.track.album.images[2].url,
+        // });
+      });
+      if (val.body.next) {
+        const newOff = off + 100;
+        playlist(formatted, newOff, listData, queueT);
+      }
+    });
+  }
 
   function useDebounced(value: string) {
     const [debouncedVal, setDebouncedVal] = useState(value);
@@ -51,64 +70,51 @@ export const Dashboard:React.FC<Props> = ({ code }:Props) => {
         setDebouncedVal(value);
         if (!search) { setSearchResults([]); return; }
         if (!accessToken) return;
+        if (!search.includes('playlist')) { return; }
         let formatted = '';
         let z = 34;
         while (value.substring(z, z + 1) !== '?') {
           formatted += value.substring(z, z + 1);
           z += 1;
         }
-        spotifyApi.getPlaylist(formatted).then((res) => {
-          res.body?.tracks?.items.map((track) => (queue.push(track.track.uri)));
-          // setQueue(res.body?.tracks?.items.map((track) => (track.track.uri)));
-          // const newQueue = Array.from(queue);
+        // let repeat = false;
+        spotifyApi.getPlaylistTracks(formatted, { offset: 0 }).then((res) => {
+          console.log(res);
+          // eslint-disable-next-line array-callback-return
+          const listData:SpotifyData[] = [];
+          // eslint-disable-next-line array-callback-return
+          res.body?.items.map((track) => {
+            queue.push(track.track.uri);
+            listData?.push({
+              artists: track.track.artists[0].name,
+              title: track.track.name,
+              uri: track.track.uri,
+              albumUrl: track.track.album.images[2].url,
+            });
+          });
+          if (res.body?.next) {
+            playlist(formatted, 100, listData, queue);
+          }
+
+          // console.log(listData);
           for (let i = queue.length - 1; i > 0; i -= 1) {
             const j = Math.floor(Math.random() * i);
             const temp = queue[i];
             queue[i] = queue[j];
             queue[j] = temp;
-            // const temp2 = newQueue[i];
-            // newQueue[i] = newQueue[j];
-            // newQueue[j] = temp2;
           }
 
           setQueue(queue);
+          setSearchResults(listData);
           // console.log(queue);
-          setSearchResults(res.body?.tracks?.items.map((track) => ({
-            artists: track.track.artists[0].name,
-            title: track.track.name,
-            uri: track.track.uri,
-            albumUrl: track.track.album.images[2].url,
-          })));
         }, (err) => {
           console.log(err);
         });
-        // if (!search.includes('playlist')) {
-        //   spotifyApi.searchTracks(search).then((res) => {
-        //     setSearchResults(res.body?.tracks?.items.map((track) => ({
-        //       artists: track.artists[0].name,
-        //       title: track.name,
-        //       uri: track.uri,
-        //       albumUrl: track.album.images[2].url,
-        //     })));
-        //   });
-        // } else {
-        //   const formatted = search.replace(' playlist', '');
-        //   console.log(formatted);
-        //   spotifyApi.getPlaylist(formatted).then((res) => {
-        //     setQueue(res.body?.tracks?.items.map((track) => (track.track.uri)));
-        //     // console.log(queue);
-        //     setSearchResults(res.body?.tracks?.items.map((track) => ({
-        //       artists: track.track.artists[0].name,
-        //       title: track.track.name,
-        //       uri: track.track.uri,
-        //       albumUrl: track.track.album.images[2].url,
-        //     })));
-        //   }, (err) => {
-        //     console.log(err);
-        //   });
-        //   console.log(queue);
-        // }
       }, 500);
+
+      // while(repeat) {
+      //       if (response.)
+      // }
 
       return () => {
         clearTimeout(timeoutId);
@@ -122,27 +128,13 @@ export const Dashboard:React.FC<Props> = ({ code }:Props) => {
     spotifyApi.setAccessToken(accessToken);
   }, [accessToken]);
 
-  // TODO
-  useEffect(() => {
-    // setQueue(queue.sort(() => Math.random() - 0.5));
-    // const newQueue = Array.from(queue);
-    // for (let i = queue.length - 1; i > 0; i -= 1) {
-    //   const j = Math.floor(Math.random() * i);
-    //   const temp = queue[i];
-    //   queue[i] = queue[j];
-    //   queue[j] = temp;
-    //   const temp2 = newQueue[i];
-    //   newQueue[i] = newQueue[j];
-    //   newQueue[j] = temp2;
-    // }
+  // useEffect(() => {
+  //   console.log(queue);
+  // }, [queue]);
 
-    // setQueue(newQueue);
-    console.log(queue);
-  }, [queue]);
-
-  useEffect(() => {
-    console.log(images);
-  }, [images]);
+  // useEffect(() => {
+  //   console.log(images);
+  // }, [images]);
 
   const onChange = (
     imageList: ImageListType,
@@ -150,14 +142,6 @@ export const Dashboard:React.FC<Props> = ({ code }:Props) => {
   ) => {
     setImages(imageList as never[]);
   };
-
-  // function bgImages(args1, args2) {
-  //   if (args1 > 0 and args2>0)
-  // }
-
-  // useEffect(() => {
-  //   console.log(playing);
-  // }, [playing]);
 
   window.history.pushState({}, '', '/');
   return (
@@ -223,20 +207,6 @@ export const Dashboard:React.FC<Props> = ({ code }:Props) => {
                 marginTop: '1rem',
               }}
               >
-                {/* <Button
-                  variant="contained"
-                  onClick={() => {
-                    if (images.length > 0) {
-                      onImageUpdate(0);
-                    } else {
-                      onImageUpload();
-                    }
-                  }}
-                  style={{ marginBottom: '1rem' }}
-                >
-                  CLICK TO CHANGE BG
-
-                </Button> */}
                 <Grid
                   container
                   direction="row"
